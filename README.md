@@ -29,13 +29,13 @@ Better Groovy Scripts:-
 
         stage('Deploy to Kubernetes') {
             steps {
-                    sh 'kubectl get deployments'
                     sh 'kubectl apply -f deployment.yaml'
             }
         }
 
         stage('Verify Deployment') {
             steps {
+                sh 'kubectl get deployments'
                 sh 'kubectl rollout status deployment/your-deployment-name'
             }
         }
