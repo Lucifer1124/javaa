@@ -16,14 +16,12 @@ Better Groovy Scripts:-
 
         stage('Build & Test') {
             steps {
-                // Combines building and testing into one efficient step
-                sh 'mvn clean package' 
+                sh 'mvn clean package -DskipTest' 
             }
         }
 
         stage('Build & Push Docker Image') {
             steps {
-                // Best practice: Tag with build number instead of just 'latest'
                 sh 'docker build -t your-registry/java-cicd:${BUILD_NUMBER} .'
                 // sh 'docker push your-registry/java-cicd:${BUILD_NUMBER}'
             }
