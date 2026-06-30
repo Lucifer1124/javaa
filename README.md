@@ -1,60 +1,53 @@
-Better Groovy Script:-
+Better Groovy Scripts:-
 
-  pipeline {
-    agent any
 
-    stages {
+    pipeline {
+    agent any
+    tools {
+        maven 'Maven 3.9.x' // Ensures maven is available
+    }
 
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/<YOUR_GITHUB_USERNAME>/java-cicd.git'
-            }
-        }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/<YOUR_GITHUB_USERNAME>/java-cicd.git'
+            }
+        }
 
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
+        stage('Build & Test') {
+            steps {
+                // Combines building and testing into one efficient step
+                sh 'mvn clean package' 
+            }
+        }
 
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
+        stage('Build & Push Docker Image') {
+            steps {
+                // Best practice: Tag with build number instead of just 'latest'
+                sh 'docker build -t your-registry/java-cicd:${BUILD_NUMBER} .'
+                // sh 'docker push your-registry/java-cicd:${BUILD_NUMBER}'
+            }
+        }
 
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t java-cicd:latest .'
-            }
-        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                // Best practice: Use a secure credentials block for cluster access
+                // withKubeConfig([credentialsId: 'k8s-secret']) {
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'kubectl apply -f service.yaml'
+                // }
+            }
+        }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
-            }
-        }
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl rollout status deployment/your-deployment-name' // Better than just 'get pods'
+            }
+        }
+    }
 
-        stage('Verify Deployment') {
-            steps {
-                sh 'kubectl get deployments'
-                sh 'kubectl get pods'
-                sh 'kubectl get services'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-
-        failure {
-            echo 'Pipeline execution failed!'
-        }
-    }
+    post {
+        success { echo 'Pipeline executed successfully!' }
+        failure { echo 'Pipeline execution failed!' }
+    }
 }
-
-is this groovy script valid for running in an automated pipeline or not ?
