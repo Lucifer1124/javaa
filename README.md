@@ -4,7 +4,7 @@ Better Groovy Scripts:-
     pipeline {
     agent any
     tools {
-        maven 'Maven 3.9.x' // Ensures maven is available
+        maven 'Maven 3.9.x'
     }
 
     stages {
@@ -31,17 +31,13 @@ Better Groovy Scripts:-
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Best practice: Use a secure credentials block for cluster access
-                // withKubeConfig([credentialsId: 'k8s-secret']) {
                     sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
-                // }
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'kubectl rollout status deployment/your-deployment-name' // Better than just 'get pods'
+                sh 'kubectl rollout status deployment/your-deployment-name'
             }
         }
     }
