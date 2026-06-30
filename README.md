@@ -31,6 +31,7 @@ Better Groovy Scripts:-
 
         stage('Deploy to Kubernetes') {
             steps {
+                    sh 'kubectl get deployments'
                     sh 'kubectl apply -f deployment.yaml'
             }
         }
